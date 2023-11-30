@@ -1,9 +1,10 @@
 import 'package:equatable/equatable.dart';
 
-class counter extends Equatable {
+// ignore: must_be_immutable
+class Counter extends Equatable {
   int value;
 
-  counter({ this.value = 1});
+  Counter({ this.value = 1});
   increment() => value++;
   decrement() => value--;
   

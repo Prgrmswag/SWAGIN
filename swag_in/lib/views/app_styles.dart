@@ -9,14 +9,15 @@ const Color kDarkGrey = Color(0xff878787);
 const Color kLightGrey = Color(0xffededed);
 const Color kWhite = Color(0xffffffff);
 const Color kYellow = Color(0xffffd33c);
+const Color kBlueBlack = Color(0xff1B2028);
+const Color kMetallicYellow = Color(0xffFDCC0D);
 
 const double kBorderRadius = 12.0;
 const double kPaddingHorizontal = 24.0;
 
 final kInputBorder = OutlineInputBorder(
   borderRadius: BorderRadius.circular(kBorderRadius),
-  borderSide: const BorderSide(color: kLightGrey
-  ),
+  borderSide: const BorderSide(color: kBlack),
 );
 
 final kEncodesansBold = GoogleFonts.encodeSans(

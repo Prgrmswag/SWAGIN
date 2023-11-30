@@ -2,31 +2,25 @@ import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:swag_in/app_styles.dart';
-import 'package:swag_in/size_config.dart';
 
-class home extends StatefulWidget {
-  const home({super.key});
+import 'package:swag_in/cart.dart';
+import 'package:swag_in/product_info_page.dart';
+import 'package:swag_in/product_temp.dart';
+import 'package:swag_in/views/api.dart';
+import 'package:swag_in/views/app_styles.dart';
+import 'package:swag_in/views/profile.dart';
+import 'package:swag_in/views/size_config.dart';
+
+class Home extends StatefulWidget {
+  const Home({Key? key}) : super(key: key);
 
   @override
-  State<home> createState() => _homeState();
+  State<Home> createState() => _HomeState();
 }
 
-class _homeState extends State<home> {
-  List<String> categories = [
-    "All items",
-    "Shirt",
-    "Hoodie",
-    "Jeans",
-  ];
-
-  List<String> svg = [
-    "All_item",
-    "shirt",
-    "hoodie",
-    "jeans",
-  ];
-
+class _HomeState extends State<Home> {
+  List<String> categories = ["All items", "Shirt", "Hoodie", "Jeans"];
+  List<String> svg = ["All_item", "shirt", "hoodie", "jeans"];
   List<String> models = [
     'ModelImage1',
     'ModelImage2',
@@ -41,68 +35,95 @@ class _homeState extends State<home> {
   int current = 0;
   int _currentIndex = 0;
 
+  late List<Map<String, dynamic>> products = [];
+
+  bool heartTapped = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    fetchProducts().then((result) {
+      setState(() {
+        products = result;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     sizeConfig().init(context);
     return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        height: 64,
-        child: CustomNavigationBar(
-          isFloating: true,
-          borderRadius: const Radius.circular(40),
-          unSelectedColor: kGrey,
-          selectedColor: kWhite,
-          backgroundColor: kBrown,
-          strokeColor: Colors.transparent,
-          scaleFactor: 0.1,
-          iconSize: 40,
-          items: [
-            CustomNavigationBarItem(
-              icon: _currentIndex == 0
-                  ? SvgPicture.asset('assets/images/svg/home_selected.svg')
-                  : SvgPicture.asset('assets/images/svg/home_unselected.svg'),
+      bottomNavigationBar: CustomNavigationBar(
+        isFloating: false,
+        borderRadius: const Radius.circular(3),
+        unSelectedColor: kWhite,
+        selectedColor: kWhite,
+        backgroundColor: kBrown,
+        strokeColor: Colors.transparent,
+        scaleFactor: 0.2,
+        iconSize: 35,
+        items: [
+          CustomNavigationBarItem(
+            icon: Icon(
+              _currentIndex == 0 ? Icons.home : Icons.home_outlined,
+              // Adjust color or other properties as needed
             ),
-            CustomNavigationBarItem(
-              icon: _currentIndex == 1
-                  ? SvgPicture.asset('assets/images/svg/cart_selected.svg')
-                  : SvgPicture.asset('assets/images/svg/cart_unselected.svg'),
+          ),
+          CustomNavigationBarItem(
+            icon: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => cart()));
+              },
+              child: Icon(
+                _currentIndex == 1
+                    ? Icons.shopping_cart
+                    : Icons.shopping_cart_outlined,
+                // Adjust color or other properties as needed
+              ),
             ),
-            CustomNavigationBarItem(
-                icon: _currentIndex == 2
-                    ? SvgPicture.asset('assets/images/svg/heart_selected.svg')
-                    : SvgPicture.asset(
-                        'assets/images/svg/heart_unselected.svg')),
-            CustomNavigationBarItem(
-                icon: _currentIndex == 3
-                    ? SvgPicture.asset('assets/images/svg/account_selected.svg')
-                    : SvgPicture.asset(
-                        'assets/images/svg/account_unselected.svg')),
-          ],
-          currentIndex: _currentIndex,
-          onTap: (index) {
-            setState(() {
-              _currentIndex = index;
+          ),
+          CustomNavigationBarItem(
+            icon: Icon(
+              _currentIndex == 2 ? Icons.local_offer : Icons.local_offer_outlined,
+              // Adjust color or other properties as needed
+            ),
+          ),
+          CustomNavigationBarItem(
+              icon: GestureDetector(
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ProfilePage()));
             },
-            );
-          },
-        ),
+            child: Icon(
+              _currentIndex == 3 ? Icons.person : Icons.person_outline,
+              // Adjust color or other properties as needed
+            ),
+          )),
+        ],
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
       ),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: ListView(
           children: [
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: kPaddingHorizontal),
+              padding: const EdgeInsets.symmetric(
+                horizontal: kPaddingHorizontal,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(
-                      top: 16,
+                      top: 10,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,6 +132,7 @@ class _homeState extends State<home> {
                         Text(
                           'Hello, Welcome 👋',
                           style: kEncodesansregular.copyWith(
+                            fontWeight: FontWeight.w500,
                             color: kBrown,
                             fontSize: sizeConfig.blockSizeHorizontal! * 3.6,
                           ),
@@ -128,12 +150,22 @@ class _homeState extends State<home> {
                       ],
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 16),
-                    child: CircleAvatar(
-                      radius: 28,
-                      backgroundColor: kGrey,
-                      backgroundImage: AssetImage('assets/images/zeni.png'),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProfilePage(),
+                          ),
+                        );
+                      },
+                      child: const CircleAvatar(
+                        radius: 28,
+                        backgroundColor: kGrey,
+                        backgroundImage: AssetImage('assets/images/zeni.png'),
+                      ),
                     ),
                   )
                 ],
@@ -141,50 +173,53 @@ class _homeState extends State<home> {
             ),
             const SizedBox(height: 24),
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: kPaddingHorizontal),
+              padding: const EdgeInsets.symmetric(
+                horizontal: kPaddingHorizontal,
+              ),
               child: Row(
                 children: [
                   Expanded(
                     child: TextField(
                       style: kEncodesansregular.copyWith(
-                        color: kDarkGrey,
+                        color: kBlack,
                         fontSize: sizeConfig.blockSizeHorizontal! * 3.5,
                       ),
                       controller: TextEditingController(),
                       decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 13,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 13,
+                        ),
+                        prefixIcon: const IconTheme(
+                          data: IconThemeData(
+                            color: kBlack,
                           ),
-                          prefixIcon: const IconTheme(
-                            data: IconThemeData(
-                              color: kDarkGrey,
-                            ),
-                            child: Icon(Icons.search),
-                          ),
-                          hintText: 'Search your Style  ',
-                          border: kInputBorder,
-                          errorBorder: kInputBorder,
-                          disabledBorder: kInputBorder,
-                          focusedBorder: kInputBorder,
-                          focusedErrorBorder: kInputBorder,
-                          enabledBorder: kInputBorder,
-                          hintStyle: kEncodesansregular.copyWith(
-                            color: kDarkGrey,
-                            fontSize: sizeConfig.blockSizeHorizontal! * 3.5,
-                          )),
+                          child: Icon(Icons.search),
+                        ),
+                        hintText: 'Search your Style  ',
+                        border: kInputBorder,
+                        errorBorder: kInputBorder,
+                        disabledBorder: kInputBorder,
+                        focusedBorder: kInputBorder,
+                        focusedErrorBorder: kInputBorder,
+                        enabledBorder: kInputBorder,
+                        hintStyle: kEncodesansregular.copyWith(
+                          color: kDarkGrey,
+                          fontSize: sizeConfig.blockSizeHorizontal! * 3.5,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Container(
-                      padding: const EdgeInsets.all(12),
-                      height: 49,
-                      width: 49,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(kBorderRadius),
-                        color: kBlack,
-                      ),
-                      child: Image.asset('assets/images/f.png'))
+                    padding: const EdgeInsets.all(12),
+                    height: 49,
+                    width: 49,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(kBorderRadius),
+                      color: kBlack,
+                    ),
+                    child: Image.asset('assets/images/f.png'),
+                  ),
                 ],
               ),
             ),
@@ -213,21 +248,22 @@ class _homeState extends State<home> {
                       padding: const EdgeInsets.symmetric(horizontal: 7),
                       height: 36,
                       decoration: BoxDecoration(
-                          color: current == index ? kBrown : kWhite,
-                          borderRadius: BorderRadius.circular(8),
-                          border: current == index ? null : Border.all()),
+                        color: current == index ? kBrown : kWhite,
+                        borderRadius: BorderRadius.circular(8),
+                        border: current == index ? null : Border.all(),
+                      ),
                       child: Row(
                         children: [
-
                           SizedBox(
                             height: 28,
                             width: 28,
-                            child: SvgPicture.asset(current == index
-                                ? 'assets/images/svg/${svg[index]}_selected.svg'
-                                : 'assets/images/svg/${svg[index]}_unselected.svg'),
+                            child: SvgPicture.asset(
+                              current == index
+                                  ? 'assets/images/svg/${svg[index]}_selected.svg'
+                                  : 'assets/images/svg/${svg[index]}_unselected.svg',
+                            ),
                           ),
                           const SizedBox(width: 5),
-
                           Text(
                             categories[index],
                             style: kEncodesansMedium.copyWith(
@@ -251,38 +287,64 @@ class _homeState extends State<home> {
               crossAxisCount: 2,
               crossAxisSpacing: 20,
               mainAxisSpacing: 23,
-              itemCount: models.length,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: kPaddingHorizontal),
+              itemCount: products.length,
+              padding: const EdgeInsets.symmetric(
+                horizontal: kPaddingHorizontal,
+              ),
               itemBuilder: (context, index) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Stack(
                       children: [
-                        Positioned(
+                        InkWell(
+                     onTap: () {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => ProductDes(
+        image: products[index]['image'],
+        title: products[index]['title'],
+        description: products[index]['description'],
+        category: products[index]['category'],
+      ),
+    ),
+  );
+},
+
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(kBorderRadius),
-                            child: Image.asset(
-                             
-                              'assets/images/models/${models[index]}.png',
+                            child: Image.network(
+                              products[index]['image'],
+                              filterQuality: FilterQuality.high,
                               fit: BoxFit.cover,
                             ),
                           ),
                         ),
                         Positioned(
                             top: 9,
-                            right: 8,
-                            child: GestureDetector(
-                              onTap: () {},
-                              child: SvgPicture.asset(
-                                  'assets/images/svg/heart_unselected.svg'),
-                            ))
+                            right: 7,
+                            child: InkWell(
+                              child: Icon(
+                                heartTapped
+                                    ? Icons.favorite
+                                    : Icons.favorite_outline_rounded,
+                                color: heartTapped ? Colors.red : Colors.black,
+                                size: 30,
+                              ),
+                              onTap: () {
+                                setState(
+                                  () {
+                                    heartTapped = !heartTapped;
+                                  },
+                                );
+                              },
+                            )),
                       ],
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Modern Light Clothes',
+                      products[index]['title'],
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: kEncodesansSemiBold.copyWith(
@@ -292,12 +354,12 @@ class _homeState extends State<home> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      ' Dress modern ',
+                      products[index]['category'],
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: kEncodesansregular.copyWith(
                         color: kGrey,
-                        fontSize: sizeConfig.blockSizeHorizontal! * 2.5,
+                        fontSize: sizeConfig.blockSizeHorizontal! * 2.8,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -306,7 +368,7 @@ class _homeState extends State<home> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          ' \$212.99',
+                          '\$ ${products[index]['price'].toString()}',
                           maxLines: 1,
                           style: kEncodesansSemiBold.copyWith(
                             color: kBlack,
@@ -319,12 +381,12 @@ class _homeState extends State<home> {
                             children: [
                               const Icon(
                                 Icons.star,
-                                color: Colors.yellow,
-                                size: 16,
+                                color: kMetallicYellow,
+                                size: 17,
                               ),
                               const SizedBox(width: 2),
                               Text(
-                                ' 5.0',
+                                products[index]['rate'].toString(),
                                 style: kEncodesansregular.copyWith(
                                   color: kBlack,
                                   fontSize: sizeConfig.blockSizeHorizontal! * 3,
@@ -334,11 +396,11 @@ class _homeState extends State<home> {
                           ),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 );
               },
-            )
+            ),
           ],
         ),
       ),

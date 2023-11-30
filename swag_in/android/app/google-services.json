@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "709159862006",
+    "project_id": "swagin-b2fca",
+    "storage_bucket": "swagin-b2fca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:709159862006:android:207b8e6eb5c7d06c99f6d7",
+        "android_client_info": {
+          "package_name": "com.example.swag_in"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvS9mwKvPv6KOh8ZIAYCmInBqwXBi0PJM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
